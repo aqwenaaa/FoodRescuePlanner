@@ -22,7 +22,10 @@ void main() {
     FoodItem("Roti Tawar", "Grain", 8, 1),
   ];
 
-  print("=== FOOD RESCUE PLANNER ===");
+  print("===================================================");
+  print("|              FOOD RESCUE PLANNER                |");
+  print("===================================================");
+
   int choice;
   do {
     print("\nMenu:");
@@ -31,6 +34,7 @@ void main() {
     print("3. Rencanakan donasi");
     print("4. Tambah stok");
     print("0. Keluar");
+
     choice = _readInt("Pilih menu: ", min: 0, max: 4);
 
     switch (choice) {
