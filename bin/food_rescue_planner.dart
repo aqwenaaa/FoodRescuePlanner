@@ -3,9 +3,9 @@ import 'dart:io';
 // Model item
 class FoodItem {
   String name;
-  String category;
-  int quantity;
-  int daysLeft;
+  String category; // Protein, Produce, Grain, Other
+  int quantity;    // jumlah unit
+  int daysLeft;    // sisa hari kadaluarsa (>=0)
 
   FoodItem(this.name, this.category, this.quantity, this.daysLeft);
 
@@ -25,15 +25,16 @@ void main() {
   print("===================================================");
   print("|              FOOD RESCUE PLANNER                |");
   print("===================================================");
-  int choice;
 
+  int choice;
   do {
     print("\nMenu:");
     print("1. Lihat inventori");
-    print("2. Simulasikan hari berlalu"); // AKTIF di branch ini
+    print("2. Simulasikan hari berlalu"); // diaktifkan
     print("3. (Akan ada) Rencanakan donasi");
     print("4. (Akan ada) Tambah stok");
     print("0. Keluar");
+
     choice = _readInt("Pilih menu: ", min: 0, max: 4);
 
     switch (choice) {
@@ -41,7 +42,7 @@ void main() {
         _showInventory(inventory);
         break;
       case 2:
-        _simulateDays(inventory); // fitur baru
+        _simulateDays(inventory); // fitur baru dari expiry-simulation
         break;
       case 3:
       case 4:
@@ -62,6 +63,7 @@ void _showInventory(List<FoodItem> inv) {
     print("Belum ada stok.");
     return;
   }
+
   for (final item in inv) {
     String flag;
     if (item.daysLeft <= 0 && item.quantity > 0) {
@@ -73,6 +75,7 @@ void _showInventory(List<FoodItem> inv) {
     }
     print("${item.toString()}$flag");
   }
+
   for (final item in inv) {
     if (item.quantity == 0) continue;
     if (item.daysLeft <= 0) {
@@ -82,11 +85,11 @@ void _showInventory(List<FoodItem> inv) {
   }
 }
 
-// Simulasi berjalannya hari: kurangi daysLeft jika >0
+// Simulasi berjalannya hari: kurangi daysLeft jika > 0
 void _simulateDays(List<FoodItem> inv) {
   final days = _readInt("Masukkan jumlah hari yang ingin disimulasikan: ", min: 1);
 
-  // nested for: hari -> item
+  // nested for: per hari, update setiap item
   for (int d = 1; d <= days; d++) {
     for (final item in inv) {
       if (item.quantity == 0) continue;
@@ -96,6 +99,7 @@ void _simulateDays(List<FoodItem> inv) {
   print("Simulasi $days hari selesai. Cek inventori untuk status terbaru.");
 }
 
+// Helper input int + validasi
 int _readInt(String prompt, {int? min, int? max}) {
   int? value;
   do {
