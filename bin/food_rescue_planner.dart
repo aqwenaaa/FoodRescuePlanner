@@ -1,64 +1,105 @@
 import 'dart:io';
 
+class FoodItem {
+  String name;
+  String category; // Protein, Produce, Grain, Other
+  int quantity;    // jumlah unit
+  int daysLeft;    // sisa hari kadaluarsa (>=0)
+
+  FoodItem(this.name, this.category, this.quantity, this.daysLeft);
+
+  @override
+  String toString() =>
+      "$name [$category] | qty: $quantity | sisa hari: $daysLeft";
+}
+
 void main() {
-  // Banner sederhana biar keliatan cakep pas jalan
+  final inventory = <FoodItem>[
+    FoodItem("Ayam Fillet", "Protein", 6, 2),
+    FoodItem("Wortel", "Produce", 10, 4),
+    FoodItem("Beras 5kg", "Grain", 3, 90),
+    FoodItem("Roti Tawar", "Grain", 8, 1),
+  ];
+
   print("===================================================");
   print("|              FOOD RESCUE PLANNER                |");
   print("===================================================");
-  print("Versi awal. Fitur akan ditambahkan lewat branch fitur.");
-
-  int choice; // variabel buat nampung pilihan menu user
-
-  // do-while dipakai supaya menu MUNCUL minimal sekali
+  int choice;
   do {
     print("\nMenu:");
-    print("1. (Akan ada) Lihat inventori");
+    print("1. Lihat inventori");
+    print("2. (Akan ada) Simulasikan hari berlalu");
+    print("3. (Akan ada) Rencanakan donasi");
+    print("4. (Akan ada) Tambah stok");
     print("0. Keluar");
+    choice = _readInt("Pilih menu: ", min: 0, max: 4);
 
-    // minta input angka dengan helper _readInt (ada validasi min/max)
-    choice = _readInt("Pilih menu: ", min: 0, max: 1);
-
-    // logika sederhana: sekarang baru ada dua opsi
-    if (choice == 1) {
-      print("Fitur belum tersedia di main. Checkout branch fitur ya.");
-    } else if (choice == 0) {
-      print("Sampai jumpa!");
+    switch (choice) {
+      case 1:
+        _showInventory(inventory);
+        break;
+      case 2:
+      case 3:
+      case 4:
+        print("Fitur belum tersedia di branch ini.");
+        break;
+      case 0:
+        print("Terima kasih sudah menyelamatkan makanan hari ini!");
+        break;
+      default:
+        print("Pilihan tidak valid.");
     }
-  } while (choice != 0); // ulangi terus sampai user pilih 0 (keluar)
+  } while (choice != 0);
 }
 
-// Helper untuk baca input INT dari terminal, lengkap sama validasi
+void _showInventory(List<FoodItem> inv) {
+  print("\n-- INVENTORI --");
+  if (inv.isEmpty) {
+    print("Belum ada stok.");
+    return;
+  }
+
+  for (final item in inv) {
+    String flag;
+    if (item.daysLeft <= 0 && item.quantity > 0) {
+      flag = " (EXPIRED!)";
+    } else if (item.daysLeft <= 2 && item.quantity > 0) {
+      flag = " (PERINGATAN: segera gunakan/donasikan)";
+    } else {
+      flag = "";
+    }
+    print("${item.toString()}$flag");
+  }
+
+  for (final item in inv) {
+    if (item.quantity == 0) continue;
+    if (item.daysLeft <= 0) {
+      print("! Terdapat item kadaluarsa: ${item.name}");
+      break;
+    }
+  }
+}
+
 int _readInt(String prompt, {int? min, int? max}) {
-  int? value; // kita pakai tipe nullable biar bisa diisi null saat invalid
-
+  int? value;
   do {
-    stdout.write(prompt);          // tampilkan prompt tanpa newline
-    final raw = stdin.readLineSync(); // baca satu baris dari keyboard
-    value = int.tryParse(raw ?? "");  // coba parse ke int, gagal -> null
-
+    stdout.write(prompt);
+    final raw = stdin.readLineSync();
+    value = int.tryParse(raw ?? "");
     if (value == null) {
       print("Masukan tidak valid. Harus angka.");
-      continue; // balik ke atas loop minta input lagi
+      continue;
     }
-
-    // cek batas bawah kalau diset
     if (min != null && value < min) {
       print("Nilai minimal $min.");
-      value = null; // set null biar loop lanjut minta input lagi
+      value = null;
       continue;
     }
-
-    // cek batas atas kalau diset
     if (max != null && value > max) {
       print("Nilai maksimal $max.");
-      value = null; // set null biar loop lanjut minta input lagi
+      value = null;
       continue;
     }
-  } while (value == null); // selama value belum valid, ulangi
-
-  // NOTE penting:
-  // Fungsi ini bertipe 'int' (non-null), sedangkan 'value' itu 'int?' (nullable).
-  // Supaya aman secara null-safety, pakai 'value!' atau ubah tipe return jadi 'int?'.
-  // Di project kita, lebih pas pakai 'value!' karena kita udah pastikan tidak null.
-  return value!; // pakai tanda '!' karena value dijamin tidak null di titik ini
+  } while (value == null);
+  return value!;
 }
