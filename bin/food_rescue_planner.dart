@@ -1,5 +1,6 @@
 import 'dart:io';
 
+// Model item
 class FoodItem {
   String name;
   String category; // Protein, Produce, Grain, Other
@@ -24,14 +25,16 @@ void main() {
   print("===================================================");
   print("|              FOOD RESCUE PLANNER                |");
   print("===================================================");
+
   int choice;
   do {
     print("\nMenu:");
     print("1. Lihat inventori");
-    print("2. (Akan ada) Simulasikan hari berlalu");
+    print("2. Simulasikan hari berlalu"); // diaktifkan
     print("3. (Akan ada) Rencanakan donasi");
     print("4. (Akan ada) Tambah stok");
     print("0. Keluar");
+
     choice = _readInt("Pilih menu: ", min: 0, max: 4);
 
     switch (choice) {
@@ -39,6 +42,8 @@ void main() {
         _showInventory(inventory);
         break;
       case 2:
+        _simulateDays(inventory); // fitur baru dari expiry-simulation
+        break;
       case 3:
       case 4:
         print("Fitur belum tersedia di branch ini.");
@@ -80,6 +85,21 @@ void _showInventory(List<FoodItem> inv) {
   }
 }
 
+// Simulasi berjalannya hari: kurangi daysLeft jika > 0
+void _simulateDays(List<FoodItem> inv) {
+  final days = _readInt("Masukkan jumlah hari yang ingin disimulasikan: ", min: 1);
+
+  // nested for: per hari, update setiap item
+  for (int d = 1; d <= days; d++) {
+    for (final item in inv) {
+      if (item.quantity == 0) continue;
+      if (item.daysLeft > 0) item.daysLeft -= 1;
+    }
+  }
+  print("Simulasi $days hari selesai. Cek inventori untuk status terbaru.");
+}
+
+// Helper input int + validasi
 int _readInt(String prompt, {int? min, int? max}) {
   int? value;
   do {
